@@ -47,10 +47,7 @@ const Liquidity = () => {
       error = "NCT Amount must be greater than 0";
     }
     if (lpTokenInCirculation) {
-      const requiredAmount =
-        contractETH - ethAmount == 0
-          ? 0
-          : (ethAmount * contractNCT) / (contractETH - ethAmount);
+      const requiredAmount = (ethAmount * contractNCT) / contractETH;
 
       if (nctAmount <= requiredAmount) {
         error = `The NCT input amount must be greater than ${requiredAmount} for the provided ETH value of ${ethAmount}`;
