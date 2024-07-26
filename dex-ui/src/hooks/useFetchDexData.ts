@@ -11,7 +11,6 @@ const useFetchDexData = (
   signer: ethers.Signer | null,
   dispatch: AppDispatch
 ) => {
-  console.log("called dex");
   useEffect(() => {
     const fetchData = async () => {
       if (!alchemyProvider) return;

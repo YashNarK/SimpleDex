@@ -61,7 +61,6 @@ const Liquidity = () => {
 
     const ethInBigInt = utilityService.convertFloatToBigInt(ethAmount);
     const nctInBigInt = utilityService.convertFloatToBigInt(nctAmount);
-    console.log(ethInBigInt, nctInBigInt, ethAmount, nctAmount);
     if (!error)
       if (provider && signer) {
         const simpleDexService = new SimpleDexService(provider, signer);

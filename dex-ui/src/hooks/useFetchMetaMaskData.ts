@@ -7,7 +7,6 @@ import { NCT_CONTRACT_ADDRESS, NCT_CONTRACT_ABI, SIMPLE_DEX_ADDRESS, SIMPLE_DEX_
 import { AppDispatch } from "../store";
 
 const useFetchMetaMaskData = (signer:ethers.Signer|null, provider:ethers.BrowserProvider|null, dispatch:AppDispatch) => {
-    console.log("called meta")
   const toast = useCustomToast();
 
   useEffect(() => {

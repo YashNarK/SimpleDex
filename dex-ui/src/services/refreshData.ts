@@ -55,7 +55,6 @@ export const refreshDexData = async (
       contractETH: contractETH_inNumber,
     };
     dispatch(setInfo(payload));
-    console.log("dex:", payload);
   } catch (error) {
     console.error("Failed to fetch contract data:", error);
   }
@@ -94,7 +93,6 @@ export const refreshMetaMaskData = async (
       lpTokenBalance: lpTokenBalance,
     };
     dispatch(setBalances(payload));
-    console.log("metamask:", payload);
   } catch (error) {
     console.error("Failed to fetch MetaMask data:", error);
   }
