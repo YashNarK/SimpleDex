@@ -46,7 +46,7 @@ const Liquidity = () => {
     } else if (nctAmount == 0) {
       error = "NCT Amount must be greater than 0";
     }
-    if (lpTokenInCirculation) {
+    else if (lpTokenInCirculation) {
       const requiredAmount = (ethAmount * contractNCT) / contractETH;
 
       if (nctAmount <= requiredAmount) {
