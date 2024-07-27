@@ -1692,7 +1692,7 @@ const Header = () => {
         <Button
           variant={"outline"}
           as={Link}
-          href="https://sepolia.etherscan.io/token/0x1C547bC1771165cE5cd60139D93CfE0a063637Bf"
+          href="https://sepolia.etherscan.io/token/0x94a3ea97513d12F7f123325B82cC1952B1Df137f"
           isExternal
           leftIcon={<MdOutlineGeneratingTokens />}
           colorScheme="teal"
