@@ -29,8 +29,8 @@ const CryptoStat = ({ label, number }: CryptoStatPropsType) => {
       py={"10px"} // Padding on the Y-axis
     >
       <Stat>
-        <StatLabel>{label}</StatLabel> // Label for the statistic
-        <StatNumber>{number}</StatNumber> // Value of the statistic
+        <StatLabel>{label}</StatLabel> 
+        <StatNumber>{number}</StatNumber> 
       </Stat>
     </Box>
   );
