@@ -7,6 +7,7 @@ import { useAppDispatch } from "../../hooks";
 import useCustomToast from "../../hooks/useCustomToast";
 import useFetchMetaMaskData from "../../hooks/useFetchMetaMaskData";
 import styles from "./Header.module.css";
+import MetaMaskError from "../../types/MetamaskError.type";
 
 const Header = () => {
   const [error, setError] = useState<string>("");
@@ -30,6 +31,63 @@ const Header = () => {
       }
 
       await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      const sepoliaNetwork = {
+        chainId: "0xaa36a7", // Hexadecimal chain ID for Sepolia
+        chainName: "Sepolia Test Network",
+        nativeCurrency: {
+          name: "SepoliaETH",
+          symbol: "SepoliaETH",
+          decimals: 18,
+        },
+        rpcUrls: ["https://sepolia.infura.io/v3/"],
+        blockExplorerUrls: ["https://sepolia.etherscan.io"],
+      };
+
+      // Switch to Sepolia network
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: sepoliaNetwork.chainId }],
+        });
+        toast({
+          status: "success",
+          title: "Successfully Connected to Sepolia Network",
+        });
+      } catch (switchError) {
+        const error = switchError as MetaMaskError;
+        // This error code indicates that the chain has not been added to MetaMask
+        if (error.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [sepoliaNetwork],
+            });
+          } catch (addError) {
+            const addErrorTyped = addError as MetaMaskError;
+            // Handle "add" error
+            console.error("Error adding Sepolia network", addErrorTyped);
+            setError(addErrorTyped.message);
+            toast({
+              status: "error",
+              title: "Network Error",
+              description: addErrorTyped.message,
+            });
+            return;
+          }
+        } else {
+          // Handle other "switch" errors
+          console.error("Error switching to Sepolia network", error);
+          setError(error.message);
+          toast({
+            status: "error",
+            title: "Network Error",
+            description: error.message,
+          });
+          return;
+        }
+      }
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signerObject = await provider.getSigner();
       setProvider(provider);
@@ -70,14 +128,14 @@ const Header = () => {
           A Decentralized Exchange for Sepolia network
         </span>
       </p>
-      {!signer && !provider &&
+      {!signer && !provider && (
         <Box my={"10px"}>
           <Button colorScheme="yellow" onClick={onWalletConnect}>
             <Icon as={SiWalletconnect} fontSize={"large"} m={"5px"} />
             Connect Metamask
           </Button>
         </Box>
-      }
+      )}
     </Box>
   );
 };
