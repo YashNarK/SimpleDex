@@ -459,32 +459,35 @@ contract SimpleDEX is Ownable, ERC20 {
     // Function to add liquidity to the contract
     // _amount: amount of tokens to add
     function addLiquidity(uint256 _amount) public payable returns (uint256) {
-        uint256 _liquidity;
+        require(msg.value > 0, "Must send ETH to add liquidity");
+        require(_amount > 0, "Must send tokens to add liquidity");
+        uint256 _liquidity = msg.value;
         uint256 balanceInEth = getETHsInContract() - msg.value; // Current ETH balance of the contract excluding current deposit
         uint256 tokenReserve = getTokensInContract(); // Current token balance of the contract
 
         // If there's no token reserve, initialize the liquidity pool
-        if (tokenReserve == 0) {
-            require(msg.value > 0, "Must send ETH to add liquidity");
-            require(_amount > 0, "Must send tokens to add liquidity");
+        if (totalSupply() == 0) {
+
             token.transferFrom(msg.sender, address(this), _amount); // Transfer tokens from user to contract
-            _liquidity = msg.value; // Set initial liquidity to the ETH balance
+             // Set initial liquidity to the ETH balance
             _mint(msg.sender, _liquidity); // Mint liquidity tokens to the user
         } else {
             uint256 reservedEth = balanceInEth; // ETH reserve excluding the current deposit
             uint256 reservedTokens = tokenReserve;
 
-            // Calculates how many tokens can be bought for provided ETH value.
-            //The number of tokens being sent must be greater than or equal to that many number of tokens.
-            require(
-                _amount >= (msg.value * reservedTokens) / reservedEth,
-                "Amount of tokens sent is less than the minimum tokens required"
-            );
-            token.transferFrom(msg.sender, address(this), _amount); // Transfer tokens from user to contract
-            unchecked {
-                // totalSupply() refers to the total number of liquidity tokens that have been minted and are currently in circulation.
+            // Check if reservedEth is zero before performing the division
+            if (reservedEth > 0)  {
+                // Calculates how many tokens can be bought for provided ETH value.
+                // The number of tokens being sent must be greater than or equal to that many number of tokens.
+                require(
+                    _amount >= (msg.value * reservedTokens) / reservedEth,
+                    "Amount of tokens sent is less than the minimum tokens required"
+                );
+                 // totalSupply() refers to the total number of liquidity tokens that have been minted and are currently in circulation.
                 _liquidity = (totalSupply() * msg.value) / reservedEth; // Calculate liquidity to be minted
             }
+
+            token.transferFrom(msg.sender, address(this), _amount); // Transfer tokens from user to contract
             _mint(msg.sender, _liquidity); // Mint liquidity tokens to the user
         }
         return _liquidity;
@@ -531,7 +534,7 @@ contract SimpleDEX is Ownable, ERC20 {
         uint256 outputReserve
     ) public pure returns (uint256) {
         require(inputReserve > 0 && outputReserve > 0, "Invalid Reserves");
-        uint256 inputAmountWithFee = (inputAmount * 99)/100; // Apply a 1% fee
+        uint256 inputAmountWithFee = (inputAmount * 99) / 100; // Apply a 1% fee
         uint256 numerator = (inputReserve * outputReserve);
         uint256 denominator = (inputAmountWithFee + inputReserve);
         unchecked {
@@ -553,7 +556,6 @@ contract SimpleDEX is Ownable, ERC20 {
     // Function to swap tokens for ETH
     // _tokensSold: amount of tokens to sell
     function swapTokenToEth(uint256 _tokensSold) public {
-
         uint256 ethBought = getAmountOfTokens(
             _tokensSold, // x' - New deposit
             getTokensInContract(), // x - Token reserve before swap
@@ -566,12 +568,11 @@ contract SimpleDEX is Ownable, ERC20 {
 }
 
 ```
-
 ## 6. Contract Deployment:
 
 ### **Shortcut: using RemixIDE**
 
-Contract can be deployed easily using [Remix IDE](https://remix.ethereum.org) itself by injecting metamask network (while using sepolia) and note the address where it is deployed (eg: `0x77507F01012fAADec75d796A362fc513a4F1b354`).
+Contract can be deployed easily using [Remix IDE](https://remix.ethereum.org) itself by injecting metamask network (while using sepolia) and note the address where it is deployed (eg: `0x1C547bC1771165cE5cd60139D93CfE0a063637Bf`).
 
 ### **Using Hardhat and OpenZeppelin Defender:**
 
