@@ -15,27 +15,32 @@ import {
   refreshMetaMaskData,
 } from "../../services/refreshData";
 import useCustomToast from "../../hooks/useCustomToast";
+
 const Swap = () => {
-  // hooks
+  // Access Redux state related to wallet and DEX information
   const { ethBalance, nctBalance } = useAppSelector((s) => s.metamask);
   const { ethPerToken, tokenPerEth, contractETH, contractNCT } = useAppSelector(
     (s) => s.info
   );
   const { ethAmount, nctAmount } = useAppSelector((s) => s.swap);
+
+  // Manage the current swap mode (ETH to NCT or NCT to ETH)
   const [swapMode, setSwapMode] = useState<"e2n" | "n2e" | "">("");
   const { signer, provider } = useSigner();
   const dispatch = useAppDispatch();
   const [estimatedSwapOutput, setEstimatedSwapOutput] = useState(0);
 
+  // Initialize SimpleDexService if provider and signer are available
   const simpleDexService =
     provider && signer && new SimpleDexService(provider, signer);
 
   const toast = useCustomToast();
 
-  // helper functions
+  // Handle the swap action based on the selected mode
   const onSwap = async () => {
     let error = false;
     const swapActions: { [key: string]: () => Promise<void> } = {
+      // Swap ETH to NCT
       e2n: async () => {
         if (ethAmount == 0) {
           error = true;
@@ -56,6 +61,7 @@ const Swap = () => {
           await resp?.wait();
         }
       },
+      // Swap NCT to ETH
       n2e: async () => {
         if (nctAmount == 0) {
           error = true;
@@ -94,8 +100,7 @@ const Swap = () => {
     }
   };
 
-  // component
-
+  // Render component
   return (
     <Box
       borderRadius={"2xl"}
@@ -106,6 +111,7 @@ const Swap = () => {
       h={"100%"}
       alignContent={"center"}
     >
+      {/* Swap Button */}
       <Button
         onClick={onSwap}
         isDisabled={
@@ -115,6 +121,7 @@ const Swap = () => {
       >
         <Icon as={RiTokenSwapFill} fontSize={"large"} m={"5px"} /> Swap
       </Button>
+      {/* Select Crypto Pair */}
       <Box
         mx={"auto"}
         my={"10px"}
@@ -133,14 +140,17 @@ const Swap = () => {
             dispatch(resetSwapInput());
           }}
         >
+          {/* Option to swap ETH to NCT */}
           <option disabled={ethBalance == 0} value="e2n">
             ETH to NCT
           </option>
+          {/* Option to swap NCT to ETH */}
           <option disabled={nctBalance == 0} value="n2e">
             NCT to ETH
           </option>
         </Select>
       </Box>
+      {/* Input fields and estimated output */}
       {swapMode && swapMode == "n2e" && (
         <CryptoInput
           label="NCT Amount"
@@ -150,6 +160,7 @@ const Swap = () => {
           value={nctAmount}
           onValueChange={(valueAsString) => {
             dispatch(setSwapInput({ nctAmount: parseFloat(valueAsString) }));
+            // Calculate estimated output for NCT to ETH swap
             const estimation = utilityService.calculateSwapOutputAmount(
               parseFloat(valueAsString),
               contractNCT,
@@ -166,6 +177,7 @@ const Swap = () => {
           value={ethAmount}
           onValueChange={(valueAsString) => {
             dispatch(setSwapInput({ ethAmount: parseFloat(valueAsString) }));
+            // Calculate estimated output for ETH to NCT swap
             const estimation = utilityService.calculateSwapOutputAmount(
               parseFloat(valueAsString),
               contractETH,
@@ -175,6 +187,7 @@ const Swap = () => {
           }}
         />
       )}
+      {/* Display estimated output */}
       {swapMode && (
         <Box>
           Estimated Output:{" "}

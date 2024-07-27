@@ -1,3 +1,4 @@
+// dex-ui\src\components\Header\Header.tsx
 import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useState } from "react";
@@ -12,16 +13,22 @@ import MetaMaskError from "../../types/MetamaskError.type";
 import styles from "./Header.module.css";
 
 const Header = () => {
+  // State to hold error messages
   const [error, setError] = useState<string>("");
+  // Redux dispatch function for updating application state
   const dispatch = useAppDispatch();
+  // Custom toast hook for displaying notifications
   const toast = useCustomToast();
+  // Context hooks for accessing signer and provider
   const { signer, provider, setSigner, setProvider } = useSigner();
 
-  // Use the custom hook here
+  // Custom hook to fetch MetaMask data and update Redux store
   useFetchMetaMaskData(signer, provider, dispatch);
 
+  // Handler function for connecting the wallet
   const onWalletConnect = async () => {
     try {
+      // Check if MetaMask is installed
       if (!window.ethereum) {
         const errorMessage = "Metamask is not installed";
         setError(errorMessage);
@@ -32,8 +39,10 @@ const Header = () => {
         return;
       }
 
+      // Request MetaMask to connect to the user's accounts
       await window.ethereum.request({ method: "eth_requestAccounts" });
 
+      // Define Sepolia network configuration
       const sepoliaNetwork = {
         chainId: "0xaa36a7", // Hexadecimal chain ID for Sepolia
         chainName: "Sepolia Test Network",
@@ -46,7 +55,7 @@ const Header = () => {
         blockExplorerUrls: ["https://sepolia.etherscan.io"],
       };
 
-      // Switch to Sepolia network
+      // Attempt to switch to the Sepolia network
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
@@ -58,16 +67,17 @@ const Header = () => {
         });
       } catch (switchError) {
         const error = switchError as MetaMaskError;
-        // This error code indicates that the chain has not been added to MetaMask
+        // Handle case where Sepolia network is not added to MetaMask
         if (error.code === 4902) {
           try {
+            // Add Sepolia network to MetaMask
             await window.ethereum.request({
               method: "wallet_addEthereumChain",
               params: [sepoliaNetwork],
             });
           } catch (addError) {
             const addErrorTyped = addError as MetaMaskError;
-            // Handle "add" error
+            // Handle errors when adding the network
             console.error("Error adding Sepolia network", addErrorTyped);
             setError(addErrorTyped.message);
             toast({
@@ -78,7 +88,7 @@ const Header = () => {
             return;
           }
         } else {
-          // Handle other "switch" errors
+          // Handle other errors that occur while switching networks
           console.error("Error switching to Sepolia network", error);
           setError(error.message);
           toast({
@@ -90,11 +100,15 @@ const Header = () => {
         }
       }
 
+      // Create a new provider instance for interacting with the Ethereum network
       const provider = new ethers.BrowserProvider(window.ethereum);
+      // Get the signer object from the provider
       const signerObject = await provider.getSigner();
+      // Update context with the new provider and signer
       setProvider(provider);
       setSigner(signerObject);
     } catch (err) {
+      // Handle errors during wallet connection
       if (err instanceof Error) {
         setError(err.message);
         toast({
@@ -116,7 +130,7 @@ const Header = () => {
 
   return (
     <Box w={"100%"}>
-      {/* HEADING */}
+      {/* HEADER SECTION */}
       <Box
         textColor={"slategray"}
         fontSize={"large"}
@@ -133,7 +147,7 @@ const Header = () => {
         </p>
       </Box>
 
-      {/* WALLECT CONNECT BUTTON */}
+      {/* CONNECT WALLET BUTTON */}
       {!signer && !provider && (
         <Box my={"10px"} textAlign={"center"}>
           <Button
@@ -146,8 +160,8 @@ const Header = () => {
         </Box>
       )}
 
-      {/* SOURCE CODE BUTTON FLEX */}
-      <Flex gap={2} flexDir={{base:"column", md:"row"}} justifyContent={"start"} >
+      {/* SOURCE CODE AND CONTRACT LINKS */}
+      <Flex gap={2} flexDir={{base:"column", md:"row"}} justifyContent={"start"}>
         <Button
           variant={"outline"}
           as={Link}
