@@ -3,6 +3,7 @@ import Header from "../Header";
 import Swap from "../Swap";
 import Liquidity from "../Liquidity";
 import Info from "../Info";
+import Footer from "../Footer";
 
 const Layout = () => {
   return (
@@ -11,12 +12,18 @@ const Layout = () => {
         base: `"header"
               "swap"
               "liquidity"
-              "info"`,
+              "info"
+              "footer"
+              `,
         md: `"header header"
              "swap liquidity"           
-             "info info"`,
+             "info info"
+             "footer footer"`,
       }}
-      gridTemplateRows={`100px 1fr 1fr`}
+      gridTemplateRows={{
+        base: `300px 300px 600px 1fr 50px`,
+        md: `150px 1fr 1fr 50px`,
+      }}
       gridTemplateColumns={{
         base: `1fr`,
         md: `1fr 1fr`,
@@ -35,6 +42,9 @@ const Layout = () => {
       </GridItem>
       <GridItem area={"info"}>
         <Info />
+      </GridItem>
+      <GridItem area={"footer"}>
+        <Footer />
       </GridItem>
     </Grid>
   );
