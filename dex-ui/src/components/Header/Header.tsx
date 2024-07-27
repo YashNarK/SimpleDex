@@ -1,13 +1,15 @@
-import { Box, Button, Icon } from "@chakra-ui/react";
+import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useState } from "react";
-import { SiWalletconnect } from "react-icons/si";
+import { FaFileContract } from "react-icons/fa";
+import { MdOutlineGeneratingTokens } from "react-icons/md";
+import { SiGithub, SiWalletconnect } from "react-icons/si";
 import { useSigner } from "../../context/SignerContext";
 import { useAppDispatch } from "../../hooks";
 import useCustomToast from "../../hooks/useCustomToast";
 import useFetchMetaMaskData from "../../hooks/useFetchMetaMaskData";
-import styles from "./Header.module.css";
 import MetaMaskError from "../../types/MetamaskError.type";
+import styles from "./Header.module.css";
 
 const Header = () => {
   const [error, setError] = useState<string>("");
@@ -113,29 +115,73 @@ const Header = () => {
   };
 
   return (
-    <Box
-      w={"100%"}
-      textColor={"slategray"}
-      fontSize={"large"}
-      fontWeight={"bold"}
-      textAlign={"center"}
-      fontFamily={"cursive"}
-    >
-      <p>
-        {" "}
-        Simple DEX -{" "}
-        <span className={styles.italicsText}>
-          A Decentralized Exchange for Sepolia network
-        </span>
-      </p>
+    <Box w={"100%"}>
+      {/* HEADING */}
+      <Box
+        textColor={"slategray"}
+        fontSize={"large"}
+        fontWeight={"bold"}
+        fontFamily={"cursive"}
+        textAlign={"center"}
+      >
+        <p>
+          {" "}
+          Simple DEX -{" "}
+          <span className={styles.italicsText}>
+            A Decentralized Exchange for Sepolia network
+          </span>
+        </p>
+      </Box>
+
+      {/* WALLECT CONNECT BUTTON */}
       {!signer && !provider && (
-        <Box my={"10px"}>
-          <Button colorScheme="yellow" onClick={onWalletConnect}>
-            <Icon as={SiWalletconnect} fontSize={"large"} m={"5px"} />
+        <Box my={"10px"} textAlign={"center"}>
+          <Button
+            leftIcon={<SiWalletconnect />}
+            colorScheme="yellow"
+            onClick={onWalletConnect}
+          >
             Connect Metamask
           </Button>
         </Box>
       )}
+
+      {/* SOURCE CODE BUTTON FLEX */}
+      <Flex gap={2} flexDir={{base:"column", md:"row"}} justifyContent={"start"} >
+        <Button
+          variant={"outline"}
+          as={Link}
+          href="https://github.com/YashNarK/SimpleDex"
+          isExternal
+          leftIcon={<SiGithub />}
+          colorScheme="cyan"
+          _hover={{ textDecoration: "none" }}
+        >
+          Source Code
+        </Button>
+        <Button
+          variant={"outline"}
+          as={Link}
+          href="https://sepolia.etherscan.io/token/0x1C547bC1771165cE5cd60139D93CfE0a063637Bf"
+          isExternal
+          leftIcon={<MdOutlineGeneratingTokens />}
+          colorScheme="teal"
+          _hover={{ textDecoration: "none" }}
+        >
+          NCT Token Contract
+        </Button>
+        <Button
+          variant={"outline"}
+          as={Link}
+          href="https://sepolia.etherscan.io/address/0x1C547bC1771165cE5cd60139D93CfE0a063637Bf"
+          isExternal
+          leftIcon={<FaFileContract />}
+          colorScheme="blue"
+          _hover={{ textDecoration: "none" }}
+        >
+          DEX Smart Contract
+        </Button>
+      </Flex>
     </Box>
   );
 };
